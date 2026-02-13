@@ -31,16 +31,24 @@ process.on('SIGTERM', () => {
 
 const app = express();
 const httpServer = createServer(app);
+
+// Parse CORS origins from environment or use defaults
+const corsOrigins = process.env.CORS_ORIGINS 
+  ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim())
+  : ['http://localhost:3000', 'http://localhost:4001', 'https://gold-tracker-web.vercel.app'];
+
+logger.info(`CORS Origins configured: ${corsOrigins.join(', ')}`);
+
 const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:4001'],
+    origin: corsOrigins,
     methods: ['GET', 'POST'],
   },
 });
 
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:4001'],
+  origin: corsOrigins,
   credentials: true,
 }));
 app.use(express.json());
