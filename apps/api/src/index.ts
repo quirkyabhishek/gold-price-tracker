@@ -46,7 +46,9 @@ const io = new SocketIOServer(httpServer, {
   },
 });
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
 app.use(cors({
   origin: corsOrigins,
   credentials: true,
