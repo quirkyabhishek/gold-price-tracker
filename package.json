@@ -1,0 +1,26 @@
+{
+  "name": "gold-price-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Real-time Gold Price Tracker - Compare prices from Indian jewellers",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:api": "npm run dev --workspace=@gold-tracker/api",
+    "dev:web": "npm run dev --workspace=@gold-tracker/web",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "clean": "turbo run clean && rimraf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.2.0"
+}

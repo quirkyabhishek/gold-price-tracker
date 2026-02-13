@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User management
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  name          String?
+  phone         String?
+  fcmToken      String?        // Firebase Cloud Messaging token
+  telegramId    String?
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  alerts        PriceAlert[]
+  notifications Notification[]
+  watchlist     Watchlist[]
+}
+
+// E-commerce platforms
+model Platform {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  displayName String
+  baseUrl     String
+  logoUrl     String?
+  category    PlatformCategory
+  isActive    Boolean   @default(true)
+  priority    Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+}
+
+enum PlatformCategory {
+  ECOMMERCE       // Flipkart, Amazon, Myntra, etc.
+  JEWELLERY       // Tanishq, Malabar, Kalyan, etc.
+  QUICK_COMMERCE  // Zepto, Blinkit, Swiggy, etc.
+  GOLD_DEALER     // Muthoot, etc.
+}
+
+// Gold products from various platforms
+model Product {
+  id             String       @id @default(uuid())
+  platformId     String
+  platform       Platform     @relation(fields: [platformId], references: [id])
+  externalId     String       // Product ID on the platform
+  name           String
+  description    String?
+  productUrl     String
+  imageUrl       String?
+  weight         Float        // Weight in grams
+  purity         String       @default("24K") // 24K, 22K, etc.
+  makingCharges  Float?       // Making charges if any
+  gstPercent     Float        @default(3)
+  isAvailable    Boolean      @default(true)
+  lastCheckedAt  DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  priceHistory   PriceRecord[]
+  watchlist      Watchlist[]
+  
+  @@unique([platformId, externalId])
+  @@index([weight])
+  @@index([purity])
+  @@index([isAvailable])
+}
+
+// Price history for each product
+model PriceRecord {
+  id              String   @id @default(uuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  price           Float    // Total price in INR
+  pricePerGram    Float    // Calculated price per gram
+  spotPrice       Float    // Gold spot price at the time
+  premiumPercent  Float    // Premium/discount percentage over spot
+  timestamp       DateTime @default(now())
+  
+  @@index([productId])
+  @@index([timestamp])
+  @@index([premiumPercent])
+}
+
+// Gold spot price history
+model SpotPrice {
+  id        String   @id @default(uuid())
+  priceINR  Float    // Price per gram in INR
+  priceUSD  Float    // Price per ounce in USD
+  source    String   // API source
+  timestamp DateTime @default(now())
+  
+  @@index([timestamp])
+}
+
+// User price alerts
+model PriceAlert {
+  id              String      @id @default(uuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alertType       AlertType
+  targetPrice     Float?      // Target price in INR per gram
+  targetPremium   Float?      // Target premium percentage (e.g., -1 for 1% below spot)
+  minWeight       Float?      // Minimum weight filter
+  maxWeight       Float?      // Maximum weight filter
+  purity          String?     // Purity filter (24K, 22K, etc.)
+  platforms       String[]    // Platform IDs to monitor (empty = all)
+  isActive        Boolean     @default(true)
+  notifyPush      Boolean     @default(true)
+  notifyEmail     Boolean     @default(false)
+  notifySms       Boolean     @default(false)
+  notifyTelegram  Boolean     @default(false)
+  cooldownMinutes Int         @default(5) // Minutes between repeat notifications
+  lastTriggeredAt DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([userId])
+  @@index([isActive])
+}
+
+enum AlertType {
+  PRICE_BELOW_SPOT      // Price effectively below spot rate
+  PRICE_BELOW_TARGET    // Price below target INR
+  PREMIUM_BELOW_TARGET  // Premium below target percentage
+  BACK_IN_STOCK         // Product back in stock
+  ANY_DEAL              // Any deal notification
+}
+
+// User watchlist
+model Watchlist {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  notes     String?
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, productId])
+}
+
+// Notification log
+model Notification {
+  id          String           @id @default(uuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  title       String
+  body        String
+  data        Json?
+  isRead      Boolean          @default(false)
+  sentVia     String[]         // push, email, sms, telegram
+  createdAt   DateTime         @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+}
+
+enum NotificationType {
+  PRICE_ALERT
+  DEAL_ALERT
+  STOCK_ALERT
+  SYSTEM
+}
+
+// Scraper job status
+model ScraperJob {
+  id          String       @id @default(uuid())
+  platformId  String
+  status      JobStatus
+  startedAt   DateTime     @default(now())
+  completedAt DateTime?
+  errorMsg    String?
+  itemsFound  Int          @default(0)
+  
+  @@index([platformId])
+  @@index([startedAt])
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
