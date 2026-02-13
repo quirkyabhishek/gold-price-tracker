@@ -36,7 +36,7 @@ const httpServer = createServer(app);
 // Parse CORS origins from environment or use defaults
 const corsOrigins = process.env.CORS_ORIGINS 
   ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim())
-  : ['http://localhost:3000', 'http://localhost:4001', 'https://gold-tracker-web.vercel.app'];
+  : ['http://localhost:3000', 'http://localhost:4001', 'https://gold-price-tracker-web.vercel.app'];
 
 logger.info(`CORS Origins configured: ${corsOrigins.join(', ')}`);
 
