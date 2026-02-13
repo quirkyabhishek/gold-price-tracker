@@ -1,5 +1,6 @@
 {
-  "buildCommand": "npm install --legacy-peer-deps && npm run build --workspace=@gold-tracker/web",
+  "buildCommand": "npm install && cd apps/web && npm run build",
   "outputDirectory": "apps/web/.next",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "regions": ["sfo1"]
 }
