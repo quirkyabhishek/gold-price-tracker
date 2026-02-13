@@ -1,0 +1,13 @@
+# Render Backend Configuration
+
+This file helps Render auto-detect your deployment setup.
+
+buildCommand: npm install && npm run build --workspace=@gold-tracker/api
+startCommand: npm run start --workspace=@gold-tracker/api
+envVars:
+  - key: NODE_ENV
+    value: production
+  - key: PORT
+    value: 3001
+  - key: CORS_ORIGINS
+    value: https://gold-tracker-web.vercel.app
