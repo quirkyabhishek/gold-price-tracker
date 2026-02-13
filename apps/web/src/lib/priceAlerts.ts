@@ -35,7 +35,7 @@ interface SpotPriceData {
  * Change this value to adjust when alerts trigger
  * Example: 8 = alert when difference is >= 8%
  */
-export const PRICE_ALERT_THRESHOLD = 8;
+export const PRICE_ALERT_THRESHOLD = 4;
 
 export function calculatePriceAlerts(spotPrices: SpotPriceData): PriceAlert[] {
   const alerts: PriceAlert[] = [];
