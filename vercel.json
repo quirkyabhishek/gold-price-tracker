@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd apps/web && npm install && npm run build",
+  "buildCommand": "npm install --legacy-peer-deps && npm run build --workspace=@gold-tracker/web",
   "outputDirectory": "apps/web/.next",
   "framework": "nextjs"
 }
