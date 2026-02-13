@@ -1,7 +1,9 @@
 'use client';
 
-import { AlertTriangle, TrendingUp } from 'lucide-react';
+import { AlertTriangle, TrendingUp, History } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { useEffect } from 'react';
 
 interface PriceAlert {
   type: 'ibja-vs-yahoo' | 'ibja-vs-png' | 'ibja-vs-bhima' | 'ibja-vs-kalyan';
@@ -13,9 +15,44 @@ interface PriceAlert {
 
 interface PriceAlertBannerProps {
   alerts: PriceAlert[];
+  onAlertsChange?: () => void;
 }
 
-export function PriceAlertBanner({ alerts }: PriceAlertBannerProps) {
+export function PriceAlertBanner({ alerts, onAlertsChange }: PriceAlertBannerProps) {
+  // Persist alerts to localStorage whenever they change
+  useEffect(() => {
+    if (alerts.length > 0) {
+      try {
+        const alertsWithTimestamp = alerts.map((alert) => ({
+          ...alert,
+          id: `${alert.type}-${Date.now()}-${Math.random()}`,
+          timestamp: new Date().toISOString(),
+        }));
+
+        // Get existing alerts
+        const existing = localStorage.getItem('goldPriceAlerts');
+        let allAlerts = existing ? JSON.parse(existing) : [];
+
+        // Add new alerts (avoid duplicates within same second)
+        const newAlerts = alertsWithTimestamp.filter((newAlert) => {
+          return !allAlerts.some(
+            (existing: any) =>
+              existing.type === newAlert.type &&
+              existing.delta.toFixed(2) === newAlert.delta.toFixed(2)
+          );
+        });
+
+        if (newAlerts.length > 0) {
+          allAlerts = [...newAlerts, ...allAlerts].slice(0, 50); // Keep last 50
+          localStorage.setItem('goldPriceAlerts', JSON.stringify(allAlerts));
+          onAlertsChange?.();
+        }
+      } catch (error) {
+        console.error('Failed to persist alerts:', error);
+      }
+    }
+  }, [alerts, onAlertsChange]);
+
   if (!alerts || alerts.length === 0) {
     return null;
   }
@@ -86,6 +123,15 @@ export function PriceAlertBanner({ alerts }: PriceAlertBannerProps) {
               ? '🔴 High variance detected! Significant price differences may present opportunities or risks.'
               : '🟡 Moderate variance detected. Consider checking multiple sources before purchasing.'}
           </p>
+          <div className="mt-4">
+            <Link
+              href="/alerts"
+              className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-700/50 hover:bg-zinc-700 rounded text-xs text-zinc-300 hover:text-white transition-colors"
+            >
+              <History className="w-4 h-4" />
+              View Alert History
+            </Link>
+          </div>
         </div>
       </div>
     </motion.div>

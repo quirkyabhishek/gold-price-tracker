@@ -1,6 +1,15 @@
 # Gold Price Tracker
 
-Real-time gold price comparison from Indian jewellers with live rates from IBJA, Kalyan Jewellers, Bhima Gold, and P N Gadgil & Sons.
+Real-time gold price compa           ├── components/
+           │   ├── SpotPriceCard.tsx    # Price display
+           │   ├── DealsList.tsx        # Deals list
+           │   ├── PlatformGrid.tsx     # Platform badges
+           │   ├── AlertBanner.tsx      # Deal alerts
+           │   └── PriceAlertBanner.tsx # Price variance alerts
+           ├── lib/
+           │   ├── api.ts       # Axios client
+           │   ├── socket.tsx   # Socket.IO client
+           │   └── priceAlerts.ts # Price variance calculationsom Indian jewellers with live rates from IBJA, Kalyan Jewellers, Bhima Gold, and P N Gadgil & Sons.
 
 ## Features
 
@@ -11,6 +20,7 @@ Real-time gold price comparison from Indian jewellers with live rates from IBJA,
   - Bhima Jewellers (Homepage scraping)
   - P N Gadgil & Sons (API)
 - **Price Comparison**: See how different jewellers compare
+- **Price Variance Alerts**: Get notified when price differences exceed configured threshold
 - **WebSocket Updates**: Real-time price updates via Socket.IO
 
 ## Tech Stack
@@ -164,6 +174,24 @@ Displays all price sources with color-coded sections:
 Shows products sorted by discount from IBJA price.
 
 ## Common Tasks
+
+### Change Price Variance Alert Threshold
+Edit `apps/web/src/lib/priceAlerts.ts`:
+```typescript
+export const PRICE_ALERT_THRESHOLD = 8; // Change this number (in percentage)
+```
+
+The alert will trigger when any price source differs from IBJA by more than this percentage in either direction (higher or lower).
+
+Color coding:
+- **Amber**: 8% - 15% difference
+- **Red**: > 15% difference
+
+Comparisons made:
+- IBJA vs Yahoo Finance (International)
+- IBJA vs PNG (P N Gadgil)
+- IBJA vs Bhima
+- IBJA vs Kalyan
 
 ### Change Refresh Interval
 Edit `apps/api/src/services/spotPrice.ts`:

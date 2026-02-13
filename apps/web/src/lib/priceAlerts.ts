@@ -1,5 +1,5 @@
 /**
- * Calculate price variance alerts when delta > 8%
+ * Calculate price variance alerts when delta exceeds configured threshold
  */
 
 export interface PriceAlert {
@@ -30,7 +30,12 @@ interface SpotPriceData {
   };
 }
 
-const DELTA_THRESHOLD = 8; // 8% threshold
+/**
+ * Configurable threshold for price variance alerts (in percentage)
+ * Change this value to adjust when alerts trigger
+ * Example: 8 = alert when difference is >= 8%
+ */
+export const PRICE_ALERT_THRESHOLD = 8;
 
 export function calculatePriceAlerts(spotPrices: SpotPriceData): PriceAlert[] {
   const alerts: PriceAlert[] = [];
@@ -46,7 +51,7 @@ export function calculatePriceAlerts(spotPrices: SpotPriceData): PriceAlert[] {
     const yahooPrice = spotPrices.international.priceINR;
     const delta = Math.abs(((yahooPrice - ibjaPrice) / ibjaPrice) * 100);
 
-    if (delta > DELTA_THRESHOLD) {
+    if (delta > PRICE_ALERT_THRESHOLD) {
       alerts.push({
         type: 'ibja-vs-yahoo',
         delta,
@@ -62,7 +67,7 @@ export function calculatePriceAlerts(spotPrices: SpotPriceData): PriceAlert[] {
     const pngPrice = spotPrices.jewellers.png.gold24k;
     const delta = Math.abs(((pngPrice - ibjaPrice) / ibjaPrice) * 100);
 
-    if (delta > DELTA_THRESHOLD) {
+    if (delta > PRICE_ALERT_THRESHOLD) {
       alerts.push({
         type: 'ibja-vs-png',
         delta,
@@ -78,7 +83,7 @@ export function calculatePriceAlerts(spotPrices: SpotPriceData): PriceAlert[] {
     const bhimaPrice = spotPrices.jewellers.bhima.gold24k;
     const delta = Math.abs(((bhimaPrice - ibjaPrice) / ibjaPrice) * 100);
 
-    if (delta > DELTA_THRESHOLD) {
+    if (delta > PRICE_ALERT_THRESHOLD) {
       alerts.push({
         type: 'ibja-vs-bhima',
         delta,
@@ -95,7 +100,7 @@ export function calculatePriceAlerts(spotPrices: SpotPriceData): PriceAlert[] {
     const kalyan24kEstimate = (spotPrices.jewellers.kalyan.gold22kPerGram / 22) * 24;
     const delta = Math.abs(((kalyan24kEstimate - ibjaPrice) / ibjaPrice) * 100);
 
-    if (delta > DELTA_THRESHOLD) {
+    if (delta > PRICE_ALERT_THRESHOLD) {
       alerts.push({
         type: 'ibja-vs-kalyan',
         delta,
