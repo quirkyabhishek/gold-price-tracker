@@ -16,6 +16,7 @@ import platformRoutes from './routes/platforms.js';
 
 dotenv.config();
 
+// Force rebuild: 2026-02-13 - CORS fix deployment
 process.on('unhandledRejection', (reason, promise) => {
   logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
