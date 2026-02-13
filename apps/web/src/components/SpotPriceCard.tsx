@@ -179,7 +179,7 @@ export function SpotPriceCard({ spotPrices, isConnected, onRefresh, isRefreshing
             <Globe className="w-4 h-4 text-blue-400" />
             <span className="text-xs text-blue-400 font-medium">Yahoo Finance</span>
           </div>
-          <p className="text-2xl font-bold text-white">₹{international.priceINR.toFixed(0)}</p>
+          <p className="text-2xl font-bold text-white">₹{Math.round(international.priceINR).toLocaleString('en-IN')}</p>
           <p className="text-xs text-zinc-500">/g (24K)</p>
           <div className="mt-2 pt-2 border-t border-zinc-700 text-xs text-zinc-500">
             ${international.priceUSD.toFixed(2)}/g USD
