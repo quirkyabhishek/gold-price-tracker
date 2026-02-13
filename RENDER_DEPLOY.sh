@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Render Backend Deployment Instructions
+# This script documents the steps to deploy to Render
+
+echo "🚀 RENDER BACKEND DEPLOYMENT STEPS"
+echo "=================================="
+echo ""
+echo "Your GitHub repo: https://github.com/quirkyabhishek/gold-price-tracker"
+echo ""
+echo "STEP 1: Go to https://render.com/register"
+echo "STEP 2: Sign up with GitHub and authorize"
+echo "STEP 3: Go to Dashboard and click '+ New'"
+echo "STEP 4: Select 'Web Service'"
+echo "STEP 5: Select 'gold-price-tracker' repository"
+echo ""
+echo "CONFIGURATION:"
+echo "  Name: gold-tracker-api"
+echo "  Runtime: Node"
+echo "  Root Directory: ./apps/api"
+echo "  Build Command: npm install && npm run build --workspace=@gold-tracker/api"
+echo "  Start Command: npm run start --workspace=@gold-tracker/api"
+echo ""
+echo "ENVIRONMENT VARIABLES (click Advanced → Environment):"
+echo "  PORT=3001"
+echo "  NODE_ENV=production"
+echo "  CORS_ORIGINS=https://gold-tracker-web.vercel.app"
+echo ""
+echo "Then click 'Create Web Service'"
+echo "Wait 2-3 minutes for deployment"
+echo "Copy your Render URL when ready (looks like: https://gold-tracker-api.onrender.com)"
