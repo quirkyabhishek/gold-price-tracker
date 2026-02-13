@@ -1,13 +1,15 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useMemo } from 'react';
 import { api } from '@/lib/api';
 import { SpotPriceCard } from '@/components/SpotPriceCard';
 import { DealsList } from '@/components/DealsList';
 import { PlatformGrid } from '@/components/PlatformGrid';
 import { useSocketStore } from '@/stores/socketStore';
 import { AlertBanner } from '@/components/AlertBanner';
+import { PriceAlertBanner } from '@/components/PriceAlertBanner';
+import { calculatePriceAlerts } from '@/lib/priceAlerts';
 import { motion } from 'framer-motion';
 
 export default function HomePage() {
@@ -62,14 +64,24 @@ export default function HomePage() {
 
   // Get best deals (below spot)
   const bestDeals = allDeals
-    .filter((d) => d.premiumPercent < 0)
-    .sort((a, b) => a.premiumPercent - b.premiumPercent);
+    .filter((d: any) => d.premiumPercent < 0)
+    .sort((a: any, b: any) => a.premiumPercent - b.premiumPercent);
   
   // Get reference spot price for deals (prefer IBJA)
   const referenceSpotPrice = spotPrices?.ibja?.gold999 || spotPrices?.international?.priceINR;
 
+  // Calculate price variance alerts
+  const priceAlerts = useMemo(() => {
+    return calculatePriceAlerts(spotPrices);
+  }, [spotPrices]);
+
   return (
     <div className="space-y-8">
+      {/* Price Variance Alert Banner */}
+      {priceAlerts.length > 0 && (
+        <PriceAlertBanner alerts={priceAlerts} />
+      )}
+
       {bestDeals.length > 0 && (
         <AlertBanner deals={bestDeals} />
       )}
